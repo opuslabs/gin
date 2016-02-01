@@ -19,15 +19,17 @@ type Runner interface {
 
 type runner struct {
 	bin       string
+	mean	  bool
 	args      []string
 	writer    io.Writer
 	command   *exec.Cmd
 	starttime time.Time
 }
 
-func NewRunner(bin string, args ...string) Runner {
+func NewRunner(bin string, mean bool, args ...string) Runner {
 	return &runner{
 		bin:       bin,
+		mean: 	   mean,
 		args:      args,
 		writer:    ioutil.Discard,
 		starttime: time.Now(),
@@ -65,12 +67,17 @@ func (r *runner) Kill() error {
 			close(done)
 		}()
 
+		signal := os.Interrupt
+		if (r.mean) {
+			signal = os.Kill
+		}
+
 		//Trying a "soft" kill first
 		if runtime.GOOS == "windows" {
 			if err := r.command.Process.Kill(); err != nil {
 				return err
 			}
-		} else if err := r.command.Process.Signal(os.Interrupt); err != nil {
+		} else if err := r.command.Process.Signal(signal); err != nil {
 			return err
 		}
 

@@ -58,6 +58,10 @@ func main() {
 			Name:  "godep,g",
 			Usage: "use godep when building",
 		},
+		cli.BoolFlag{
+			Name: "mean,m",
+			Usage: "Kill the server process meanly (use SIGKILL instead of SIGINT)",
+		},
 	}
 	app.Commands = []cli.Command{
 		{
